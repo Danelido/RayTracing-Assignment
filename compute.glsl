@@ -174,100 +174,46 @@ vec4 castRay(ivec2 pos)
 			//finalPixelOut = vec4(0.5f,0.5f,0.5f,1.0f);
 			obb_type obb = obb_data[objIndex];
 		
+			vec3 c1 =  obb.centre.xyz + (obb.u_hu.xyz * obb.u_hu.w );
+			vec3 c2 =  obb.centre.xyz - (obb.u_hu.xyz * obb.u_hu.w );
 
-			// Plane 1
-			vec3 c = (obb.centre.xyz + obb.u_hu.xyz); // Point on plane
-			vec3 pc = normalize(c - pointOnSurface);
-			vec3 n_p = normalize(obb.u_hu.xyz); // Normal of the plane
-			float d_p = -n_p.x * c.x - n_p.y * c.y - n_p.z * c.z;	// D value of the plane
-			// Check if the point is in the plane
-			if(dot(n_p,pc) == 0.0f){
-				finalPixelOut = shade(pointOnSurface, n_p, obb.colour.xyz);
-			}
-			
-			// Plane 2
-			c = (obb.centre.xyz - obb.u_hu.xyz); // Point on plane
-			pc = normalize(c - pointOnSurface);
-			n_p = normalize(-obb.u_hu.xyz); // Normal of the plane
-			d_p = -n_p.x * c.x - n_p.y * c.y - n_p.z * c.z;	// D value of the plane
-			// Check if the point is in the plane
-			if(dot(n_p,pc) == 0){
-				finalPixelOut = shade(pointOnSurface, n_p, obb.colour.xyz);
-			}
+			vec3 c3 =  obb.centre.xyz + (obb.v_hv.xyz * obb.v_hv.w);
+			vec3 c4 =  obb.centre.xyz - (obb.v_hv.xyz * obb.v_hv.w);
 
+			vec3 c5 =  obb.centre.xyz + (obb.w_hw.xyz * obb.w_hw.w);
+			vec3 c6 =  obb.centre.xyz - (obb.w_hw.xyz * obb.w_hw.w);
 
-			// Plane 3
-			c = (obb.centre.xyz + obb.v_hv.xyz); // Point on plane
-			pc = normalize(c - pointOnSurface);
-			n_p = normalize(-obb.u_hu.xyz); // Normal of the plane
-			d_p = -n_p.x * c.x - n_p.y * c.y - n_p.z * c.z;	// D value of the plane
-			// Check if the point is in the plane
-			if(dot(n_p,pc) == 0){
-				finalPixelOut = shade(pointOnSurface, n_p, obb.colour.xyz);
-			}
+			float lowestDot = 1000000;
+			vec3 potentialNormal;
 
-			
-			// Plane 4
-			c = (obb.centre.xyz - obb.v_hv.xyz); // Point on plane
-			pc = normalize(c - pointOnSurface);
-			n_p = normalize(-obb.u_hu.xyz); // Normal of the plane
-			d_p = -n_p.x * c.x - n_p.y * c.y - n_p.z * c.z;	// D value of the plane
-			// Check if the point is in the plane
-			if(dot(n_p,pc) == 0){
-				finalPixelOut = shade(pointOnSurface, n_p, obb.colour.xyz);
+			vec3[6] vecs = {c1,c2,c3,c4,c5,c6};
+
+			for(int i = 0; i < 6; i++)
+			{
+				// Test on face 1
+				float face1 = abs(dot(pointOnSurface - vecs[i], obb.u_hu.xyz));
+				if(min(lowestDot, face1) == face1){
+					lowestDot = face1;
+					potentialNormal = (vecs[i] - obb.centre.xyz);
+				}
+
+				// Test on face 2
+				float face3 = abs(dot(pointOnSurface - vecs[i], obb.v_hv.xyz));
+				if(min(lowestDot, face3) == face3){
+					lowestDot = face3;
+					potentialNormal = (vecs[i] - obb.centre.xyz);
+				}
+
+				// Test on face 3
+				float face5 = abs(dot(pointOnSurface - vecs[i], obb.w_hw.xyz));
+				if(min(lowestDot, face5) == face5){
+					lowestDot = face5;
+					potentialNormal = (vecs[i] - obb.centre.xyz);
+				}
+
 			}
 
-
-				// Plane 5
-			c = (obb.centre.xyz + obb.w_hw.xyz); // Point on plane
-			pc = normalize(c - pointOnSurface);
-			n_p = normalize(-obb.u_hu.xyz); // Normal of the plane
-			d_p = -n_p.x * c.x - n_p.y * c.y - n_p.z * c.z;	// D value of the plane
-			// Check if the point is in the plane
-			if(dot(n_p,pc) == 0){
-				finalPixelOut = shade(pointOnSurface, n_p, obb.colour.xyz);
-			}
-
-			
-			// Plane 6
-			c = (obb.centre.xyz - obb.w_hw.xyz); // Point on plane
-			pc = normalize(c - pointOnSurface);
-			n_p = normalize(-obb.u_hu.xyz); // Normal of the plane
-			d_p = -n_p.x * c.x - n_p.y * c.y - n_p.z * c.z;	// D value of the plane
-			// Check if the point is in the plane
-			if(dot(n_p,pc)  == 0){
-				finalPixelOut = shade(pointOnSurface, n_p, obb.colour.xyz);
-			}
-
-
-
-
-
-
-/*
-
-			vec3 c1 = (obb.u_hu.xyz - obb.centre.xyz) - pointOnSurface;
-			vec3 c2 = (-obb.u_hu.xyz - obb.centre.xyz) - pointOnSurface;
-
-			vec3 c3 = (obb.v_hv.xyz - obb.centre.xyz) - pointOnSurface;
-			vec3 c4 = (-obb.v_hv.xyz - obb.centre.xyz) - pointOnSurface;
-
-			vec3 c5 = (obb.w_hw.xyz - obb.centre.xyz) - pointOnSurface;
-			vec3 c6 = (-obb.w_hw.xyz - obb.centre.xyz) - pointOnSurface;
-*/			
-			
-
-
-
-			
-			/*
-				
-				Dra en vektor från t till mitten
-				Kolla alla sidor med dot-produkten
-				Blir det noll så har du vektorn
-				Normalisera den sen är det gucci
-			*/
-
+			finalPixelOut = shade(pointOnSurface, normalize(potentialNormal), obb.colour.xyz);
 		}
 	}
 	return finalPixelOut;
