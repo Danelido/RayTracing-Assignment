@@ -1,0 +1,48 @@
+# a comment is ANYTHING that does not start with 
+# "sc","li","ob","sp","pl","tr","st"
+
+# parsing is interrupted if "stop" is found
+# in the beggining of the line
+
+# a scene starts with the word scene, and ends when
+# the word scene is found again, or the end of the file is found.
+scene one
+
+# total number of arguments is ALWAYS multiple of (vec4)
+
+# center3, intensity1 ,rgba4
+# red
+#light -5 5 10 0.8 1.0 0.0 0.0 1.0 
+# blue
+#light 5 5 -20 0.8 0.0 0.0 1.0 1.0 
+# green
+#light -7 1.5 -1 0.8 0.0 1.0 0.0 1.0 
+# white
+light 0 30 0 3.0 1.0 1.0 1.0 1.0 
+
+# normal3,d1,rgba4
+# A positive d value, with a normal pointing up +Y, makes
+# the plane to move away from the (0,0,0) in the opposite
+# direction (so the point (0,-6,0) belongs to this plane!)
+# a point belongs to the plane if:
+# dot(normal, pointInPlane) + d == 0
+plane 0 1 0 6.0 1 1 1 1
+
+# vtx4,vtx4,vtx4,rgba4
+triangle 0.1 0 -1 1 10 0 -1 1 5 10 -1 1 1 1 0 1
+
+# center4, baseu3, hu1, basev3, hv1, basew3, hw1, rgba4
+obb 30 0 0 1 1 0 0 10 0 1 0 3 0 0 1 3 1.0 1.0 0 1
+
+# center3,radius1,rgba4
+sphere -10 0 0 4 1 1.0 0 1.0 
+#sphere 15 0 -20 3 0.1 0.1 0.1 1.0
+sphere -20 2 -50 10 0 1 1 1.0
+sphere 0 2 -50 5 1 1 1 1.0
+sphere 5 -5 -30 7 1 1 0 1.0
+
+# when scene is found, a new scene is loaded.
+scene two
+light 20 0 0 2.0 1.0 1.0 1.0 1.0
+sphere 0 0 0 4 1.0 0.5 0.0 0 
+plane 0 1 0 10 1 0 0 1
