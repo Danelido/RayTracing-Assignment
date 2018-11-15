@@ -184,8 +184,7 @@ vec4 castRay(ivec2 pos)
 			if(dot(n_p,pc) == 0.0f){
 				finalPixelOut = shade(pointOnSurface, n_p, obb.colour.xyz);
 			}
-
-
+			
 			// Plane 2
 			c = (obb.centre.xyz - obb.u_hu.xyz); // Point on plane
 			pc = normalize(c - pointOnSurface);
