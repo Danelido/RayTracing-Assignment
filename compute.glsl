@@ -319,28 +319,43 @@ void sceneTest(in vec4 ray_dir,inout float lastT, inout int objIndex, inout int 
 }
 
 float sphereTest(in vec3 rayDir, in vec3 rayOrigin, in vec4 centre_radius)
-{
+{		
+		// Vec from origin to center of sphere
 		vec3 oc = centre_radius.xyz - rayOrigin;
-		float b = dot(rayDir,oc); 
+		vec3 rayDirNorm = normalize(rayDir);
+
+		// Our t value that is going to be somewhere in the middle of the part of the ray that is in 
+		// the sphere
+		float t = dot(oc, rayDirNorm );
 		
-		if(b < 0)
-			return -1;
+		// Get the point coordinates
+		vec3 pointOnT = rayOrigin + t * rayDirNorm;
 
-		float c = dot(oc,oc) - (centre_radius.w * centre_radius.w);
-
-		if((b*b - c) < 0.0f)
-			return -1;
-
-		float t0 = -b + sqrt((b*b-c));
-		float t1 = b - sqrt((b*b-c));
+		// The length of the vector from the point to the center
+		float y = length(centre_radius.xyz - pointOnT);
 		
-		if(t0 < 0.f)
-			t0 = t1;
+		// The circle can be defined as x^2 + y^2 = r^2
 
-		if(t0 < 0.f)
+		// If y is bigger than radius we are going to end up with negative values when doing sqrt
+		// Which means that there is no hit
+		if( y > centre_radius.w)
+			return -1;
+		
+		// Calculate the x so it can be applied to the t
+		float x = sqrt(centre_radius.w * centre_radius.w - y * y);
+
+		// Get the end points ( intersection points )
+		float t1 = t - x;
+		float t2 = t + x;
+
+		// Check if they are valid
+		if(t1 < 0.f)
+			t1 = t2;
+
+		if(t1 < 0.f)
 			return -1;
 
-		return t0;
+		return t1;
 
 }
 
@@ -348,8 +363,7 @@ float planeTest(vec3 rayDir, vec3 rayOrigin, vec4 plane_info)
 {
 	// IMPLEMENT HERE
 	vec3 normal = normalize(plane_info.xyz);
-	float dp = -(dot(normal,vec3(0,-plane_info.w,0)));
-	
+	float dp = -(dot(normal, vec3(0,-plane_info.w,0)));
 	
 	// As long as ray direction and the normal of the plane is not perpendicular there will be
 	// a intersection
@@ -475,6 +489,7 @@ vec4 shade(in vec3 pointOnSurface, in vec3 normal, in vec3 colour)
 		vec3 vecToLight = light_pos.xyz - pointOnSurface;
 		float distToLight = sqrt(dot(vecToLight, vecToLight));
 		float cosVal  = dot(normalize(vecToLight),normal);
+		
 		float factor = 0.f;
 		if(cosVal > 0.0f)
 			factor = cosVal;
